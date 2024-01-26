@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{group}</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: white;
+    }
+    video {
+      width: 640px;
+      height: 480px;
+      background: #d9d9d9;
+    }
+
+    .bar {
+      width: 40px;
+      height: 480px;
+      border-radius: 40px;
+      margin-right: 10px;
+      background: linear-gradient(to bottom, red, yellow, green);
+      border-radius: 40px;
+      background-size: 100% 100%;
+      border: 2px solid red;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+    }
+    .header {
+      width: 640px;
+      height: 90px;
+      text-align: center;
+      color: #4552cd;
+      font-size: 70px;
+      font-family: Inter;
+      font-style: italic;
+      font-weight: 600;
+      word-wrap: break-word;
+    }
+    .wrap {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 200px;
+    }
+    img {
+      border: 1px solid black;
+      width: 640px;
+      height: 480px;
+    }
+  </style>
+  <body>
+    <div class="main">{video}</div>
+
+    <button class="add" onclick="add()">+</button>
+    <div class="videoadd" style="display: none">
+      <h3>Добавьте свое видео(.mp4)</h3>
+      <input type="file" id="idfile" onsubmit="add_file()" /><br />
+      <h3>Название</h3>
+      <input type="text" id="name" /><br />
+      <h3>Описание</h3>
+      <input type="text" id="description" />
+      <h3>Картинку(.jpg)</h3>
+      <input type="file" id="img" />
+      <button onclick="receive()">Отправить</button>
+    </div>
+    <script>
+      for (let i = 0; i < document.getElementsByClassName("bar").length; i++) {
+        fillBar(0, i);
+      }
+      function fillBar(percentage, el) {
+        var bar = document.getElementsByClassName("bar")[el];
+        if (percentage <= 100) {
+          bar.style.backgroundSize = "100% " + percentage + "%";
+          bar.style.backgroundPosition = "bottom";
+        }
+        return;
+      }
+
+      function loadVideo(id) {
+        id = String(id.substring(4));
+        const thumbnail = document.getElementById(`img-${id}`);
+        const videoPlayer = document.getElementById(`${id}`);
+
+        thumbnail.style.display = "none";
+        videoPlayer.style.display = "block";
+        let group = document.getElementsByTagName("title")[0].innerHTML;
+        fetch(`http://localhost:3000/download/${group}/${id}`).then(
+          (response) => {
+            const reader = response.body.getReader();
+            const contentLength = +response.headers.get("Content-Length");
+            let receivedLength = 0;
+
+            reader.read().then(function processChunk({ done, value }) {
+              if (done) {
+                return;
+              }
+
+              receivedLength += value.length;
+              const percentComplete = (receivedLength / contentLength) * 100;
+              console.log(`Загружено ${percentComplete}%`);
+              fillBar(percentComplete, Number(id));
+              return reader.read().then(processChunk);
+            });
+          }
+        );
+      }
+    </script>
+    <script>
+      function add() {
+        document.getElementsByClassName("videoadd")[0].style.display = "block";
+      }
+
+      function receive() {
+        let desc = document.getElementById("description").value;
+        let name = document.getElementById("name").value;
+        let img = document.getElementById("img");
+        let file = document.getElementById("idfile").files[0];
+        let info = {
+          group: document.getElementsByTagName("title")[0].innerHTML,
+          num: document.getElementsByTagName("video").length,
+        };
+        //data verifications
+        if (desc.length == 0) {
+          alert("Input description");
+          return;
+        }
+        if (!file) {
+          alert("Please select a file.");
+          return;
+        }
+        if (file.name.split(".").pop().toLowerCase() !== "mp4") {
+          alert("Please select a .mp4 file.");
+          return;
+        }
+        if (!name) {
+          alert("Input name");
+          return;
+        }
+        if (img) {
+          if (file.name.split(".").pop().toLowerCase() !== "jpg");
+          else {
+            alert("Please select a .jpg file.");
+            return;
+          }
+        } else {
+          alert("Please add image");
+          return;
+        }
+
+        let formData = new FormData();
+        formData.append("video", file);
+        formData.append("desc", desc);
+        formData.append("img", img);
+        formData.append("header", name);
+        formData.append("info", JSON.stringify(info));
+        //send
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:3000", true);
+        xhr.send(formData);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      height: 100vh;
+      width: 100%;
+    }
+    .Rectangle {
+      width: 75%;
+      height: 64px;
+      background: white;
+      border: 0px;
+      border-radius: 30px;
+      margin-bottom: 20px;
+    }
+    input::placeholder {
+      font-size: 30pt;
+    }
+    .huita {
+      text-align: right;
+      color: black;
+      font-size: 40px;
+      font-family: Inter;
+      font-weight: 400;
+      word-wrap: break-word;
+    }
+    .main {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 50%;
+      height: 62%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #d9d9d9;
+      border-radius: 40px;
+    }
+    input {
+      text-align: center;
+      font-size: 30pt;
+      align-items: center;
+    }
+  </style>
+  <body>
+    <div class="main">
+      <div class="container">
+          <input type="button" class="Rectangle" onclick="direct_delete()" value="Удалить аккаунт">
+          <input type="button"class="Rectangle" onclick="direct_put()"value="Редактировать профиль">
+          <input type="button"class="Rectangle"  onclick="window.location.href='/main'" value="Главное меню"></input>
+      </div>
+    </div>
+
+    <script>
+      const id = String(window.location.href).split("/")[5];
+
+      function direct_put() {
+        window.location.href = `/user/change/${id}`;
+      }
+      function direct_delete() {
+        window.location.href = `/user/delete/${id}`;
+      }
+    </script>
+  </body>
+</html>

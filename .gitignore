@@ -1,0 +1,7 @@
+groups
+img
+package.json
+package-lock.json
+node_modules
+data
+.vscode

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    input {
+      color: azure;
+      background-color: red;
+      font-size: 60pt;
+      font-weight: 700;
+      border: 5px solid black;
+      height: 300px;
+    }
+  </style>
+  <body>
+    <form>
+      <input type="submit" value="Удалить аккаунт" />
+    </form>
+    <script>
+      let url = window.location.href;
+      let form = document.getElementsByTagName("form")[0];
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        fetch(url, {
+          method: "delete",
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+        window.location.href = "\\";
+      });
+    </script>
+  </body>
+</html>
